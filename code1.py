@@ -2,24 +2,62 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 #J'importe les 3 bibliothèques utiles à la résolution des problèmes
-KM=pd.read_csv("EIVP_KMbis.csv",sep=';') #il faut remplacer EIVP_projet_1\EIVP_KM.csv par ce qu'on a comme dossier
+KM=pd.read_csv ("EIVP_KMbis.csv",sep=';') #il faut remplacer EIVP_projet_1\EIVP_KM.csv par ce qu'on a comme dossier
 #print(KM.head(50)) #pour s'assurer que le fichier est bien reconnu par le système
-#print(KM['noise']) #pour s'assurer que le fichier est bien reconnu par le système et voir le nombre de colonne
+#print (KM['noise'][0]) #pour s'assurer que le fichier est bien reconnu par le système et voir le nombre de colonne
+
+def point1 (colonne):
+    y = []
+    for element in KM[colonne]:
+        y.append (element)
+    #print (noise)
+    
 
 
-noise = []
-for element in KM['noise']:
-    noise.append(element)
-#print (noise)
-
-
-Temps = []
-k = 0
-for element in KM['sent_at']:
-    Temps.append(k)
-    k += 1
-#print (Temps)
+    Temps = []
+    k = 0
+    for element in KM['sent_at']:
+        Temps.append (k)
+        k += 1
+    #print (Temps)
 #trouver un meilleur moyen de faire les dates 
 
-plt.plot(Temps,noise)
-plt.show()
+    plt.plot (Temps,y)
+    plt.show ()
+    
+
+
+def point2 (colonne): #les données du bruit sont fournies en dBA
+    #calcul du minimum
+    m = KM[colonne][0]
+    for k in range (1,7880) :
+        if KM[colonne][k] < m :
+            m = KM[colonne][k]
+            
+    
+    #calcul du maximum
+    M = KM['noise'][0]
+    for k in range (1,7880) :
+        if KM['noise'][k] > M :
+            M = KM['noise'][k]
+        
+    
+    #calcul de l'écart-type
+    a = 0
+    for k in KM[colonne] :
+        a += k
+    a /= 7880 #on obtient la moyenne arithmétique
+    b = 0
+    for k in range (7880) : 
+        b += (abs (KM[colonne][k] - a)) ** 2
+    et = (b / 7880) ** (1/2)
+    
+    
+    #calcul de la variance
+    V = et ** 2
+    
+    
+    
+    
+    
+    
