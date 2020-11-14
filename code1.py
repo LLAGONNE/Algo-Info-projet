@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 #J'importe les 3 bibliothèques utiles à la résolution des problèmes
 KM=pd.read_csv ("EIVP_KMbis.csv",sep=';') #il faut remplacer EIVP_projet_1\EIVP_KM.csv par ce qu'on a comme dossier
 #print(KM.head(50)) #pour s'assurer que le fichier est bien reconnu par le système
@@ -27,6 +28,7 @@ def point1 (colonne):
     
 
 #J'avais pas vu qu'il fallait l faire sur la courbe..................
+
 def point2 (colonne): #les données du bruit sont fournies en dBA
     #calcul du minimum
     m = KM[colonne][0]
@@ -70,9 +72,48 @@ def point2 (colonne): #les données du bruit sont fournies en dBA
         med = (L[len (L) // 2] + L[len (L) // 2 + 1]) / 2
     else :
         med = L[len (L) // 2 + 1]
-    
-    
-    
-    
-    
-    
+        
+#on différencie maintenant suivant chaque colonne
+    if colonne == 'noise' :
+        #on va maintenant faire la moyenne logarithmique
+        d = 0
+        for k in range (7880) :
+            d += 10 ** ( (KM['noise'][k]) /10)
+        d = 10 * log10 (d / 7880)
+                
+        
+        print ('Le bruit minimal capté est',m,'dBA.')
+        print ('Le bruit maximal capté est',M,'dBA.')
+        print ('La moyenne des valeurs est',d,'dBA')
+        print ("L'cart-type des données récoltées est",et,'dBA.')
+        print ("La variance est de",V,'dBA.')
+        print ('Le bruit médian capté est de',med,'dBA.')
+        
+    if colonne == 'temp' or colonne == 'lum' or colonne == 'co2' :
+        #on va maintenant faire la moyenne arithmétique
+        d = 0
+        for k in range (7880) :
+            d += KM['temp'][k]
+        d /= 7880
+        
+        
+        print ('La valeur minimale captée est',m)
+        print ('La valeur maximale captée est',M,)
+        print ('La valeur des valeurs est',d)
+        print ("L'cart-type des données récoltées est",et)
+        print ("La variance est de",V)
+        print ('La valeur médiane captée est de',med)
+        
+    if colonne == 'humidity' :
+        #on calcule la moyenne géométrique
+        d = 1
+        for k in range (7880) :
+            d = d * (KM['humidity'][k]) ** (1/7880)
+            
+            
+        print ('La valeur minimale captée est',m)
+        print ('La valeur maximale captée est',M,)
+        print ('La valeur des valeurs est',d)
+        print ("L'cart-type des données récoltées est",et)
+        print ("La variance est de",V)
+        print ('La valeur médiane captée est de',med)
