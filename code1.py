@@ -26,7 +26,7 @@ def point1 (colonne):
     plt.show ()
     
 
-
+#J'avais pas vu qu'il fallait l faire sur la courbe..................
 def point2 (colonne): #les données du bruit sont fournies en dBA
     #calcul du minimum
     m = KM[colonne][0]
@@ -55,6 +55,21 @@ def point2 (colonne): #les données du bruit sont fournies en dBA
     
     #calcul de la variance
     V = et ** 2
+    
+    
+    #calcul de la médiane
+    L = KM[colonne]  #on va d'abord trier cette liste avec le tri par insertion par exemple
+    for i in range (1,len(L)) :
+        x=L[i]
+        j=i     
+        while j>0 and x<L[j-1] :
+            L[j]=L[j-1]
+            j=j-1
+        L[j]=x
+    if len (L) % 2 == 0 :
+        med = (L[len (L) // 2] + L[len (L) // 2 + 1]) / 2
+    else :
+        med = L[len (L) // 2 + 1]
     
     
     
