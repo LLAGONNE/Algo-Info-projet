@@ -2,8 +2,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+import sys #sys.argv pour entrer depuis matplotlib
 #J'importe les 3 bibliothèques utiles à la résolution des problèmes
-KM=pd.read_csv ("EIVP_KMbis.csv",sep=';') #il faut remplacer EIVP_projet_1\EIVP_KM.csv par ce qu'on a comme dossier
+KM=pd.read_csv (sys.argv,sep=';') #il faut remplacer EIVP_projet_1\EIVP_KM.csv par ce qu'on a comme dossier
 #print(KM.head(50)) #pour s'assurer que le fichier est bien reconnu par le système
 #print (KM['noise'][0]) #pour s'assurer que le fichier est bien reconnu par le système et voir le nombre de colonne
 
