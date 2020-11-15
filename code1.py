@@ -1,29 +1,24 @@
+#J'importe les 5 bibliothèques utiles à la résolution des problèmes:
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-import math
-import sys #sys.argv pour entrer depuis matplotlib
-#J'importe les 3 bibliothèques utiles à la résolution des problèmes
-KM=pd.read_csv (sys.argv,sep=';') #il faut remplacer EIVP_projet_1\EIVP_KM.csv par ce qu'on a comme dossier
+from math import *
+import sys #sys.argv pour permettre de pouvoir entrer les données sur powershell ou bien le terminal de windows
+KM = pd.read_csv ('EIVP_projet_1\EIVP_KMbis.csv' , sep=';') #il faut remplacer EIVP_projet_1\EIVP_KM.csv par ce qu'on a comme dossier
 #print(KM.head(50)) #pour s'assurer que le fichier est bien reconnu par le système
-#print (KM['noise'][0]) #pour s'assurer que le fichier est bien reconnu par le système et voir le nombre de colonne
+#print (KM['noise'][1]) #pour s'assurer que le fichier est bien reconnu par le système et voir le nombre de colonnes
 
-def point1 (colonne):
+def point1 (colonne,start_at,end_at):
     y = []
     for element in KM[colonne]:
         y.append (element)
     #print (noise)
-    
-
-
     Temps = []
     k = 0
-    for element in KM['sent_at']:
-        Temps.append (k)
-        k += 1
-    #print (Temps)
+    for element in KM['sent_at']: #idée de base créer une boucle pour representer le temps, ici idée est de pouvoir exprimer le départ et l'arrivée du temps
+        if 
+    print (Temps)
 #trouver un meilleur moyen de faire les dates 
-
     plt.plot (Temps,y)
     plt.show ()
     
