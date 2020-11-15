@@ -5,22 +5,32 @@ import numpy as np
 from math import *
 import sys #sys.argv pour permettre de pouvoir entrer les données sur powershell ou bien le terminal de windows
 KM = pd.read_csv ('EIVP_projet_1\EIVP_KMbis.csv' , sep=';') #il faut remplacer EIVP_projet_1\EIVP_KM.csv par ce qu'on a comme dossier
-#print(KM.head(50)) #pour s'assurer que le fichier est bien reconnu par le système
-#print (KM['noise'][1]) #pour s'assurer que le fichier est bien reconnu par le système et voir le nombre de colonnes
-
-def point1 (colonne,start_at,end_at):
+#print(KMb.tail(60)['sent_at'])  #pour s'assurer que le fichier est bien reconnu par le système
+#print (KM['noise'][1])  #pour s'assurer que le fichier est bien reconnu par le système et voir le nombre de colonnes
+KMb=KM.sort_values(by = 'sent_at') #but travailler sur des valeurs deja triés(pas sur de pouvoir l'utiliser dans le doute):
+def point1 (colonne,start_at,end_at): 
     y = []
-    for element in KM[colonne]:
-        y.append (element)
-    #print (noise)
     Temps = []
-    k = 0
-    for element in KM['sent_at']: #idée de base créer une boucle pour representer le temps, ici idée est de pouvoir exprimer le départ et l'arrivée du temps
-        if 
+    k=0
+    for i in range(len(KMb['sent_at'])): #idée de base créer une boucle pour representer le temps, ici idée est de pouvoir exprimer le départ et l'arrivée du temps
+        if end_at==KMb['sent_at'][i][:10]:
+            j=i
+        elif start_at==KMb['sent_at'][i][:10]:
+            l=i
+    Temps=[k]
+    y=[KMb[colonne][l]]
+    while KMb['sent_at'][l][:10]!=end_at:
+        k+=1
+        l+=1
+        y.append(KMb[colonne][l])
+        Temps.append(k)
+
     print (Temps)
-#trouver un meilleur moyen de faire les dates 
+    print(y)
+    #trouver un meilleur moyen de faire les dates 
     plt.plot (Temps,y)
     plt.show ()
+
     
 
 #J'avais pas vu qu'il fallait l faire sur la courbe..................
@@ -113,3 +123,6 @@ def point2 (colonne): #les données du bruit sont fournies en dBA
         print ("L'cart-type des données récoltées est",et)
         print ("La variance est de",V)
         print ('La valeur médiane captée est de',med)
+
+#EXECUTION du programme:
+colonne=
