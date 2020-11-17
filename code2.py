@@ -5,34 +5,49 @@ import numpy as np
 from math import *
 import sys #sys.argv pour permettre de pouvoir entrer les données sur powershell ou bien le terminal de windows
 
-KM = pd.read_csv ('EIVP_KMbis.csv' , sep=';') #il faut remplacer EIVP_projet_1\EIVP_KM.csv par ce qu'on a comme dossier
+KM = pd.read_csv ('EIVP_projet_1\EIVP_KMbis.csv' , sep=';') #il faut remplacer EIVP_projet_1\EIVP_KM.csv par ce qu'on a comme dossier
 #print(KMb.tail(60)['sent_at'])  #pour s'assurer que le fichier est bien reconnu par le système
 
-KMb=KM.sort_values(by = 'sent_at')
+KMb=KM.sort_values(by='id')
 
 def point1 (colonne,start_at,end_at): 
     y = []
     Temps = []
-    k = 0
+    k,j,count = 0,0,0
+    count_time1=[0]
+    count_time2=[]
+        
+    for i in range(len (KMb['sent_at'])):
+        if KMb['id'][i] != KMb['id'][count_time1[count]]:
+            count+=1
+            count_time1.append(i)
+            count_time2.append(i-1)
+    count_time2.append(len(KMb['sent_at'])-1)
+    print (count_time1, count_time2)
+    #return count_time
     
     for i in range(len (KMb['sent_at'])): #idée de base créer une boucle pour representer le temps, ici idée est de pouvoir exprimer le départ et l'arrivée du temps
-        if end_at == KMb['sent_at'][i][:10]:
-            j = i
-        elif start_at == KMb['sent_at'][i][:10]:
-            l = i
-    Temps = [k]
-    y = [KMb[colonne][l]]
+        if start_at == KMb['sent_at'][i][:10] and KMb['sent_at'][count_time1[j]][:19]==KMb['sent_at'][i][:19]:
+            l=i
+            k=0
+            print(j)
+            
+        elif end_at== KMb['sent_at'][i][:10] and KMb['sent_at'][count_time2[j]][:19]==KMb['sent_at'][i][:19]:
+            Temps.append([])
+            y.append([])
+            Temps[j].append(k)
+            y[j].append( KMb[colonne][l] )
+            
+            while KMb['sent_at'][l][:10] != end_at:
+                k += 1
+                l += 1
+                y[j].append (KMb[colonne][l])
+                Temps[j].append (k)
+            j+=1
+    for i in range(6):
+        plt.plot (Temps[i],y[i],'x')
+        plt.show ()
     
-    while KMb['sent_at'][l][:10] != end_at:
-        k += 1
-        l += 1
-        y.append (KMb[colonne][l])
-        Temps.append (k)
-
-    #print (Temps)
-    #print(y)
-    plt.plot (Temps,y,'x',':')
-    plt.show ()
 
     
 
