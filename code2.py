@@ -8,7 +8,7 @@ import sys #sys.argv pour permettre de pouvoir entrer les données sur powershel
 KM = pd.read_csv ('EIVP_KMbis.csv' , sep=';') #il faut remplacer EIVP_projet_1\EIVP_KM.csv par ce qu'on a comme dossier
 #print(KMb.tail(60)['sent_at'])  #pour s'assurer que le fichier est bien reconnu par le système
 
-KMb=KM.sort_values(by = 'sent_at') #but travailler sur des valeurs deja triés(pas sur de pouvoir l'utiliser dans le doute):
+KMb=KM.sort_values(by = 'sent_at')
 
 def point1 (colonne,start_at,end_at): 
     y = []
