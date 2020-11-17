@@ -44,8 +44,8 @@ def point1 (colonne,start_at,end_at):
                 y[j].append (KMb[colonne][l])
                 Temps[j].append (k)
             j+=1
-    for i in range(6):
-        plt.plot (Temps[i],y[i],'x')
+    for i in range(len(count_time1)):
+        plt.plot (Temps[i],y[i])
         plt.show ()
     
 
