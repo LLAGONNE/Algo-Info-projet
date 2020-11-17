@@ -37,27 +37,27 @@ def point1 (colonne,start_at,end_at):
 
 def point2 (colonne): #les données du bruit sont fournies en dBA
     #calcul du minimum
-    m = KM[colonne][0]
+    m = KMb[colonne][0]
     for k in range (1,7880) :
         if KM[colonne][k] < m :
-            m = KM[colonne][k]
+            m = KMb[colonne][k]
             
     
     #calcul du maximum
-    M = KM['noise'][0]
+    M = KMb['noise'][0]
     for k in range (1,7880) :
-        if KM['noise'][k] > M :
-            M = KM['noise'][k]
+        if KMb['noise'][k] > M :
+            M = KMb['noise'][k]
         
     
     #calcul de l'écart-type
     a = 0
-    for k in KM[colonne] :
+    for k in KMb[colonne] :
         a += k
     a /= 7880 #on obtient la moyenne arithmétique
     b = 0
     for k in range (7880) : 
-        b += (abs (KM[colonne][k] - a)) ** 2
+        b += (abs (KMb[colonne][k] - a)) ** 2
     et = (b / 7880) ** (1/2)
     
     
@@ -66,7 +66,11 @@ def point2 (colonne): #les données du bruit sont fournies en dBA
     
     
     #calcul de la médiane
-    L = KM[colonne]  #on va d'abord trier cette liste avec le tri par insertion par exemple
+    #on va d'abord trier cette liste avec le tri par insertion par exemple
+    L=[]
+    for k in range (7880) :
+        L.append (KMb[colonne][k])
+        
     for i in range (1,len(L)) :
         x = L[i]
         j = i     
@@ -84,7 +88,7 @@ def point2 (colonne): #les données du bruit sont fournies en dBA
         #on va maintenant faire la moyenne logarithmique
         d = 0
         for k in range (7880) :
-            d += 10 ** ( (KM['noise'][k]) /10)
+            d += 10 ** ( (KMb['noise'][k]) /10)
         d = 10 * log10 (d / 7880)
                 
         
@@ -99,7 +103,7 @@ def point2 (colonne): #les données du bruit sont fournies en dBA
         #on va maintenant faire la moyenne arithmétique
         d = 0
         for k in range (7880) :
-            d += KM['temp'][k]
+            d += KMb['temp'][k]
         d /= 7880
         
         
@@ -114,7 +118,7 @@ def point2 (colonne): #les données du bruit sont fournies en dBA
         #on calcule la moyenne géométrique
         d = 1
         for k in range (7880) :
-            d = d * (KM['humidity'][k]) ** (1/7880)
+            d = d * (KMb['humidity'][k]) ** (1/7880)
             
             
         print ('La valeur minimale captée est',m)
