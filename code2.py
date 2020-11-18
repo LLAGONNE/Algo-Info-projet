@@ -8,128 +8,218 @@ import sys #sys.argv pour permettre de pouvoir entrer les données sur powershel
 KM = pd.read_csv ('EIVP_KMbis.csv' , sep=';') #il faut remplacer EIVP_projet_1\EIVP_KM.csv par ce qu'on a comme dossier
 #print(KMb.tail(60)['sent_at'])  #pour s'assurer que le fichier est bien reconnu par le système
 
-KMb=KM.sort_values(by = 'sent_at') #but travailler sur des valeurs deja triés(pas sur de pouvoir l'utiliser dans le doute):
+KMb=KM.sort_values(by='id')
 
-def point1 (colonne,start_at,end_at): 
+
+
+def count_time():
+    k,j,count = 0,0,0
+    count_time1=[0]
+    count_time2=[]
+        
+    for i in range(len (KMb[time])):
+        if KMb[id][i] != KMb[id][count_time1[count]]:
+            count_time1.append(i)
+            count += 1
+            count_time2.append(i-1)
+    count_time2.append(len(KMb[time])-1)
+    #print (count_time1, count_time2)
+    #return count_time
+
+def point1 (KMb,colonne,id,time,start_at,end_at): 
     y = []
     Temps = []
-    k = 0
+    count_time()
     
-    for i in range(len (KMb['sent_at'])): #idée de base créer une boucle pour representer le temps, ici idée est de pouvoir exprimer le départ et l'arrivée du temps
-        if end_at == KMb['sent_at'][i][:10]:
-            j = i
-        elif start_at == KMb['sent_at'][i][:10]:
-            l = i
-    Temps = [k]
-    y = [KMb[colonne][l]]
-    
-    while KMb['sent_at'][l][:10] != end_at:
-        k += 1
-        l += 1
-        y.append (KMb[colonne][l])
-        Temps.append (k)
-
-    #print (Temps)
-    #print(y)
-    plt.plot (Temps,y,'x',':')
-    plt.show ()
-
-    
-
-#J'avais pas vu qu'il fallait l faire sur la courbe..................
-
-def point2 (colonne): #les données du bruit sont fournies en dBA
-    #calcul du minimum
-    m = KMb[colonne][0]
-    for k in range (1,7880) :
-        if KM[colonne][k] < m :
-            m = KMb[colonne][k]
+    for i in range(len (KMb[time])): #idée de base créer une boucle pour representer le temps, ici idée est de pouvoir exprimer le départ et l'arrivée du temps
+        if start_at == KMb[time][i][:10] and KMb[time][count_time1[j]][:19]==KMb[time][i][:19]:
+            l=i
+            k=0
+            print(j)
             
+        elif end_at== KMb[time][i][:10] and KMb[time][count_time2[j]][:19]==KMb[time][i][:19]:
+            Temps.append([])
+            y.append([])
+            Temps[j].append(k)
+            y[j].append( KMb[colonne][l] )
+            
+            while KMb[time][l][:10] != end_at:
+                k += 1
+                l += 1
+                y[j].append (KMb[colonne][l])
+                Temps[j].append (k)
+                
+            j+=1
+            
+    for i in range(len(count_time1)):
+        plt.plot (Temps[i],y[i])
+        plt.show ()
+    
+
+    
+
+
+
+def point2 (KMb,id,time,colonne): #les données du bruit sont fournies en dBA
+    
+    #boucle pour reconnaitre les limites des mesures de chaque capteurs
+    count_time()
+    
+    #calcul du minimum
+    m = 0
+    min_bruit = []
+    for j in range(len(count_time1)):
+        for k in range (count_time1[j],count_time2[j]) :
+            if KMb[colonne][k] < m :
+                m = KMb[colonne][k]
+        min_bruit.append(m)
     
     #calcul du maximum
-    M = KMb['noise'][0]
-    for k in range (1,7880) :
-        if KMb['noise'][k] > M :
-            M = KMb['noise'][k]
-        
+    M = 0
+    max_bruit = []
+    for j in range(len(count_time1)):
+        for k in range (count_time1[j],count_time2[j]) :
+            if KMb[colonne][k] > M :
+                M = KMb[colonne][k]
+        max_bruit.append(M)
     
     #calcul de l'écart-type
-    a = 0
-    for k in KMb[colonne] :
-        a += k
-    a /= 7880 #on obtient la moyenne arithmétique
-    b = 0
-    for k in range (7880) : 
-        b += (abs (KMb[colonne][k] - a)) ** 2
-    et = (b / 7880) ** (1/2)
     
+    moy=[]
+    for j in range(len(count_time1)):
+        a = 0
+        for k in range (count_time1[j],count_time2[j]) :
+            a += KMb[colonne][k]
+        a = a / (count_time2[j] - count_time1[j]) #on obtient la moyenne arithmétique
+        moy.append(a)
+    
+    
+    l=0
+    ect=[]
+    for j in range(len(count_time1)):
+        b = 0
+        for k in range (count_time1[j],count_time2[j]) : 
+            b += (abs (KMb[colonne][k] - moy[l])) ** 2
+        ect.append( (b / (count_time2[j] - count_time1[j])) ** (1/2))
+        l+=1
     
     #calcul de la variance
-    V = et ** 2
+    V=[]
+    for i in ect:
+        V.append( i ** 2 )
     
     
     #calcul de la médiane
     #on va d'abord trier cette liste avec le tri par insertion par exemple
     L=[]
-    for k in range (7880) :
-        L.append (KMb[colonne][k])
+    med=[]
+    for j in range(len(count_time1)):
+
+        L.append([])
         
-    for i in range (1,len(L)) :
-        x = L[i]
-        j = i     
-        while j > 0 and x < L[j - 1] :
-            L[j] = L[j - 1]
-            j = j - 1
-        L[j] = x
-    if len (L) % 2 == 0 :
-        med = (L[len (L) // 2] + L[len (L) // 2 + 1]) / 2
-    else :
-        med = L[len (L) // 2 + 1]
+        for k in range (count_time1[j],count_time2[j]) :
+            L[j].append (KMb[colonne][k])
+        
+        for i in range (1,len(L[j])) :
+            x = L[j][i]
+            m = i     
+            while m > 0 and x < L[j][m - 1] :
+                L[j][m] = L[j][m - 1]
+                m = m - 1
+            L[j][m] = x
+        if len (L[j]) % 2 == 0 :
+            med.append( (L[j][len (L[j]) // 2] + L[j][len (L[j]) // 2 + 1]) / 2)
+        else :
+            med.append(L[j][len (L[j]) // 2 + 1])
         
 #on différencie maintenant suivant chaque colonne
     if colonne == 'noise' :
         #on va maintenant faire la moyenne logarithmique
         d = 0
-        for k in range (7880) :
-            d += 10 ** ( (KMb['noise'][k]) /10)
-        d = 10 * log10 (d / 7880)
+        moylog=[]
+        for j in range(len(count_time1)):
+            d = 0
+            for k in range (count_time1[j],count_time2[j]) : 
+                d += 10 ** ( (KMb['noise'][k]) /10)
+            moylog.append(10 * log10 (d / (count_time2[j] - count_time1[j]) ))
                 
         
-        print ('Le bruit minimal capté est',m,'dBA.')
-        print ('Le bruit maximal capté est',M,'dBA.')
-        print ('La moyenne des valeurs est',d,'dBA')
-        print ("L'cart-type des données récoltées est",et,'dBA.')
-        print ("La variance est de",V,'dBA.')
-        print ('Le bruit médian capté est de',med,'dBA.')
+        print ('Le bruit minimal capté est',min_bruit,'dBA.')
+        print ('Le bruit maximal capté est',max_bruit,'dBA.')
+        print ('La moyenne des valeurs est',moy,'dBA')
+        print ("L'ecart-type des données récoltées est",ect,'dBA.')
+        print ("La variance est de", V ,'dBA.')
+        print ('Le bruit médian capté est de',moylog,'dBA.')
         
     if colonne == 'temp' or colonne == 'lum' or colonne == 'co2' :
         #on va maintenant faire la moyenne arithmétique
         d = 0
-        for k in range (7880) :
-            d += KMb['temp'][k]
-        d /= 7880
+        moyari=[]
+        for j in range(len(count_time1)):
+            d = 0
+            for k in range (count_time1[j],count_time2[j]) : 
+                d += KMb[colonne][k]
+            moyari.append(d/(count_time2[j] - count_time1[j]))
         
         
-        print ('La valeur minimale captée est',m)
-        print ('La valeur maximale captée est',M,)
-        print ('La valeur des valeurs est',d)
-        print ("L'cart-type des données récoltées est",et)
+        print ('La valeur minimale captée est',min_bruit)
+        print ('La valeur maximale captée est',max_bruit,)
+        print ('La valeur moyenne est',moy)
+        print ("L'ecart-type des données récoltées est",ect)
         print ("La variance est de",V)
-        print ('La valeur médiane captée est de',med)
+        print ('La valeur médiane captée est de',moyari)
         
     if colonne == 'humidity' :
         #on calcule la moyenne géométrique
-        d = 1
-        for k in range (7880) :
-            d = d * (KMb['humidity'][k]) ** (1/7880)
+        d = 0
+        moygeo=[]
+        for j in range(len(count_time1)):
+            d = 0
+            for k in range (count_time1[j],count_time2[j]) : 
+                d = d * (KMb['humidity'][k]) ** (1/(count_time2[j] - count_time1[j]))
+            moygeo.append(d)
             
-            
-        print ('La valeur minimale captée est',m)
-        print ('La valeur maximale captée est',M,)
-        print ('La valeur des valeurs est',d)
-        print ("L'cart-type des données récoltées est",et)
+        print ('La valeur minimale captée est',min_bruit)
+        print ('La valeur maximale captée est',max_bruit,)
+        print ('La valeur moyenne est',moy)
+        print ("L'ecart-type des données récoltées est",ect)
         print ("La variance est de",V)
-        print ('La valeur médiane captée est de',med)
+        print ('La valeur médiane captée est de',moygeo)
 
 #EXECUTION du programme:
-#colonne=
+a=sys.argv
+def execution(a):
+    if a[1]=="display":
+        if a[2]=="humidex" or a[2]=="Humidex":
+            point3()
+            
+
+
+def point3 (KMb,id,time) :
+    THx = pd.read_csv ('Humidex.csv' , sep=';')
+    count_time()
+    Hr1 = KMb['humidity']
+    T1 = KMb['temp']
+    Hr2 = []
+    T2 = []
+    
+    
+    for k in range (7880) :
+        if (Hr1[k] * (10 ** (- 1)) % 1) < 0.5 :
+            Hr2.append ((Hr1[k] * (10 ** (-1)) // 1) *10)
+        else :
+            Hr2.append (((Hr1[k] * (10 ** (-1)) // 1) + 1) *10)
+        if T1[k] < 23 :
+            T2.append (21)
+        if 25 <= T1[k] < 27.5 :
+            T2.append (25)
+        if T1[k] > 27.5 :
+            if (T1[k] * (10 ** (-1))) % 1 < 0.5 :
+                T2.append ((T1[k] * (10 ** (-1)) // 1) * 10)
+            else :
+                T2.append (((T1[k] * (10 ** (-1)) // 1) + 1) * 10)
+    
+        
+    
+    
+        
