@@ -70,39 +70,39 @@ def point2 (KMb,id,time,colonne): #les données du bruit sont fournies en dBA
     count_time2.append(len(KMb[time])-1)
     
     #calcul du minimum
-    m = `0
+    m = 0
     min_bruit = []
-    for j in len(count_time1):
+    for j in range(len(count_time1)):
         for k in range (count_time1[j],count_time2[j]) :
             if KMb[colonne][k] < m :
                 m = KMb[colonne][k]
         min_bruit.append(m)
     
     #calcul du maximum
-    M = KMb['noise'][0]
+    M = 0
     max_bruit = []
-    for j in len(count_time1):
+    for j in range(len(count_time1)):
         for k in range (count_time1[j],count_time2[j]) :
-            if KMb['noise'][k] > M :
-                M = KMb['noise'][k]
+            if KMb[colonne][k] > M :
+                M = KMb[colonne][k]
         max_bruit.append(M)
     
     #calcul de l'écart-type
     a = 0
     moy=[]
-    for j in len(count_time1):
+    for j in range(len(count_time1)):
         for k in range (count_time1[j],count_time2[j]) :
             a += KMb[colonne][k]
-        a = a / j #on obtient la moyenne arithmétique
+        a = a / (count_time2[j] - count_time1[j]) #on obtient la moyenne arithmétique
         moy.append(a)
     
     b = 0
     l=0
     ect=[]
-    for j in len(count_time1):
+    for j in range(len(count_time1)):
         for k in range (count_time1[j],count_time2[j]) : 
             b += (abs (KMb[colonne][k] - moy[l])) ** 2
-        ect.append( (b / j) ** (1/2))
+        ect.append( (b / (count_time2[j] - count_time1[j])) ** (1/2))
         l+=1
     
     #calcul de la variance
@@ -114,8 +114,8 @@ def point2 (KMb,id,time,colonne): #les données du bruit sont fournies en dBA
     #calcul de la médiane
     #on va d'abord trier cette liste avec le tri par insertion par exemple
     L=[]
-    
-    for j in len(count_time1):
+    med=[]
+    for j in range(len(count_time1)):
 
         L.append([])
         
@@ -130,55 +130,60 @@ def point2 (KMb,id,time,colonne): #les données du bruit sont fournies en dBA
                 m = m - 1
             L[j][m] = x
         if len (L[j]) % 2 == 0 :
-            med = (L[j][len (L[j]) // 2] + L[j][len (L[j]) // 2 + 1]) / 2
+            med.append( (L[j][len (L[j]) // 2] + L[j][len (L[j]) // 2 + 1]) / 2)
         else :
-            med = L[j][len (L[j]) // 2 + 1]
+            med.append(L[j][len (L[j]) // 2 + 1])
         
 #on différencie maintenant suivant chaque colonne
     if colonne == 'noise' :
         #on va maintenant faire la moyenne logarithmique
-        d = []
-        for j in count_time1:
-            for k in range (j) :
+        d = 0
+        moylog=[]
+        for j in range(len(count_time1)):
+            for k in range (count_time1[j],count_time2[j]) : 
                 d += 10 ** ( (KMb['noise'][k]) /10)
-            d = 10 * log10 (d / 7880)
+            moylog.append(10 * log10 (d / (count_time2[j] - count_time1[j]) ))
                 
         
-        print ('Le bruit minimal capté est',m,'dBA.')
-        print ('Le bruit maximal capté est',M,'dBA.')
-        print ('La moyenne des valeurs est',d,'dBA')
-        print ("L'cart-type des données récoltées est",et,'dBA.')
-        print ("La variance est de",V,'dBA.')
-        print ('Le bruit médian capté est de',med,'dBA.')
+        print ('Le bruit minimal capté est',min_bruit,'dBA.')
+        print ('Le bruit maximal capté est',max_bruit,'dBA.')
+        print ('La moyenne des valeurs est',moy,'dBA')
+        print ("L'ecart-type des données récoltées est",ect,'dBA.')
+        print ("La variance est de", V ,'dBA.')
+        print ('Le bruit médian capté est de',moylog,'dBA.')
         
     if colonne == 'temp' or colonne == 'lum' or colonne == 'co2' :
         #on va maintenant faire la moyenne arithmétique
         d = 0
-        for k in range (7880) :
-            d += KMb['temp'][k]
-        d /= 7880
+        moyari=[]
+        for j in range(len(count_time1)):
+            for k in range (count_time1[j],count_time2[j]) : 
+                d += KMb[colonne][k]
+        moyari.append(d/(count_time2[j] - count_time1[j]))
         
         
-        print ('La valeur minimale captée est',m)
-        print ('La valeur maximale captée est',M,)
-        print ('La valeur des valeurs est',d)
-        print ("L'cart-type des données récoltées est",et)
+        print ('La valeur minimale captée est',min_bruit)
+        print ('La valeur maximale captée est',max_bruit,)
+        print ('La valeur des valeurs est',moy)
+        print ("L'ecart-type des données récoltées est",ect)
         print ("La variance est de",V)
-        print ('La valeur médiane captée est de',med)
+        print ('La valeur médiane captée est de',moyari)
         
     if colonne == 'humidity' :
         #on calcule la moyenne géométrique
-        d = 1
-        for k in range (7880) :
-            d = d * (KMb['humidity'][k]) ** (1/7880)
+        d = 0
+        moygeo=[]
+        for j in range(len(count_time1)):
+            for k in range (count_time1[j],count_time2[j]) : 
+                d = d * (KMb['humidity'][k]) ** (1/(count_time2[j] - count_time1[j]))
+            moygeo.append(d)
             
-            
-        print ('La valeur minimale captée est',m)
-        print ('La valeur maximale captée est',M,)
-        print ('La valeur des valeurs est',d)
-        print ("L'cart-type des données récoltées est",et)
+        print ('La valeur minimale captée est',min_bruit)
+        print ('La valeur maximale captée est',max_bruit,)
+        print ('La valeur des valeurs est',moy)
+        print ("L'ecart-type des données récoltées est",ect)
         print ("La variance est de",V)
-        print ('La valeur médiane captée est de',med)
+        print ('La valeur médiane captée est de',moygeo)
 
 #EXECUTION du programme:
 a=sys.argv
