@@ -126,7 +126,7 @@ def point2 (KMb,id,time,colonne): #les données du bruit sont fournies en dBA
             x = L[j][i]
             m = i     
             while m > 0 and x < L[j][m - 1] :
-                L[m] = L[m - 1]
+                L[j][m] = L[j][m - 1]
                 m = m - 1
             L[j][m] = x
         if len (L[j]) % 2 == 0 :
