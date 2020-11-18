@@ -47,12 +47,13 @@ def point1 (KMb,colonne,id,time,start_at,end_at):
             j+=1
             
     for i in range(len(count_time1)):
-        plt.plot (Temps[i],y[i])
+        plt.plot (Temps[i],y[i],"-+",label='courbe du capteur '+str(i+1))
+        plt.title('Courbe de '+colonne)
+        plt.legend(loc='best' )
         plt.show ()
     
 
     
-
 
 
 def point2 (KMb,id,time,colonne): #les données du bruit sont fournies en dBA
@@ -70,18 +71,20 @@ def point2 (KMb,id,time,colonne): #les données du bruit sont fournies en dBA
     count_time2.append(len(KMb[time])-1)
     
     #calcul du minimum
-    m = 0
+    
     min_bruit = []
     for j in range(len(count_time1)):
+        m = KMb[colonne][j]
         for k in range (count_time1[j],count_time2[j]) :
             if KMb[colonne][k] < m :
                 m = KMb[colonne][k]
         min_bruit.append(m)
     
     #calcul du maximum
-    M = 0
+    
     max_bruit = []
     for j in range(len(count_time1)):
+        M = KMb[colonne][j]
         for k in range (count_time1[j],count_time2[j]) :
             if KMb[colonne][k] > M :
                 M = KMb[colonne][k]
@@ -155,6 +158,8 @@ def point2 (KMb,id,time,colonne): #les données du bruit sont fournies en dBA
         print ("La variance est de", V ,'dBA.')
         print ('Le bruit médian capté est de',moylog,'dBA.')
         
+        point1(KMb,colonne,id,time,'2019-08-11','2019-08-25')
+        
     if colonne == 'temp' or colonne == 'lum' or colonne == 'co2' :
         #on va maintenant faire la moyenne arithmétique
         d = 0
@@ -167,11 +172,13 @@ def point2 (KMb,id,time,colonne): #les données du bruit sont fournies en dBA
         
         
         print ('La valeur minimale captée est',min_bruit)
-        print ('La valeur maximale captée est',max_bruit,)
+        print ('La valeur maximale captée est',max_bruit)
         print ('La valeur moyenne est',moy)
         print ("L'ecart-type des données récoltées est",ect)
         print ("La variance est de",V)
         print ('La valeur médiane captée est de',moyari)
+        plt.text('La valeur minimale captée est' + str(min_bruit) + 'La valeur maximale captée est' + str(max_bruit) + 'La valeur moyenne est' +str(moy) + "L'ecart-type des données récoltées est" + str(ect) + "La variance est de" + str(V) + 'La valeur médiane captée est de'+str(moyari))
+        point1(KMb,colonne,id,time,'2019-08-11','2019-08-25')
         
     if colonne == 'humidity' :
         #on calcule la moyenne géométrique
@@ -189,6 +196,8 @@ def point2 (KMb,id,time,colonne): #les données du bruit sont fournies en dBA
         print ("L'ecart-type des données récoltées est",ect)
         print ("La variance est de",V)
         print ('La valeur médiane captée est de',moygeo)
+        
+        point1(KMb,colonne,id,time,'2019-08-11','2019-08-25')
 
 #EXECUTION du programme:
 a=sys.argv
