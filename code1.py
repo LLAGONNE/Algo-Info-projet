@@ -5,12 +5,17 @@ import numpy as np
 from math import *
 import sys #sys.argv pour permettre de pouvoir entrer les données sur powershell ou bien le terminal de windows
 
+
+
 KM = pd.read_csv ('EIVP_projet_1\EIVP_KMbis.csv' , sep=';') #il faut remplacer EIVP_projet_1\EIVP_KM.csv par ce qu'on a comme dossier
 #print(KMb.tail(60)['sent_at'])  #pour s'assurer que le fichier est bien reconnu par le système
-
 KMb=KM.sort_values(by='id')
 
-def point1 (KMb,colonne,id,time,start_at,end_at): 
+
+
+# compter les limites pour le passage entre les capteurs pour toute les fonctions
+def count_time (KMb,id,time):
+    
     y = []
     Temps = []
     k,j,count = 0,0,0
@@ -24,30 +29,63 @@ def point1 (KMb,colonne,id,time,start_at,end_at):
             count_time2.append(i-1)
     count_time2.append(len(KMb[time])-1)
     #print (count_time1, count_time2)
-    #return count_time
+    return count_time1,count_time2
+
+
+
+# pouvoir définir les limites du temps les fonctions du temps nécéssaire
+def Temps(KMb,id,time,start_at,end_at):
+    
+    Temp = []
+    count1,count2 = count_time (KMb,id,time)[0],count_time (KMb,id,time)[1]
+    j=0
     
     for i in range(len (KMb[time])): #idée de base créer une boucle pour representer le temps, ici idée est de pouvoir exprimer le départ et l'arrivée du temps
-        if start_at == KMb[time][i][:10] and KMb[time][count_time1[j]][:19]==KMb[time][i][:19]:
+        if start_at == KMb[time][i][:10] and KMb[time][count1[j]][:19]==KMb[time][i][:19]:
             l=i
             k=0
             print(j)
             
-        elif end_at== KMb[time][i][:10] and KMb[time][count_time2[j]][:19]==KMb[time][i][:19]:
-            Temps.append([])
+        elif end_at== KMb[time][i][:10] and KMb[time][count2[j]][:19]==KMb[time][i][:19]:
+            Temp.append([])
+            Temp.append( KMb[time][l] )
+            
+            while KMb[time][l][:10] != end_at:
+                Temp.append(k)
+                k += 1
+            
+            j+=1
+    return Temp
+
+
+
+
+def point1 (KMb,colonne,id,time,start_at,end_at):
+    
+    j = 0
+    y = []
+    temp = Temps(KMb,id,time,start_at,end_at)[0]
+    count1,count2 = count_time (KMb,id,time)[0],count_time (KMb,id,time)[1]
+    
+    for i in range(len (KMb[time])): #idée de base créer une boucle pour representer le temps, ici idée est de pouvoir exprimer le départ et l'arrivée du temps
+        if start_at == KMb[time][i][:10] and KMb[time][count[j]][:19]==KMb[time][i][:19]:
+            l=i
+            k=0
+            print(j)
+            
+        elif end_at== KMb[time][i][:10] and KMb[time][count[j]][:19]==KMb[time][i][:19]:
             y.append([])
-            Temps[j].append(k)
             y[j].append( KMb[colonne][l] )
             
             while KMb[time][l][:10] != end_at:
                 k += 1
                 l += 1
                 y[j].append (KMb[colonne][l])
-                Temps[j].append (k)
                 
             j+=1
-            
-    for i in range(len(count_time1)):
-        plt.plot (Temps[i],y[i],"-+",label='courbe du capteur '+str(i+1))
+    
+    for i in range(len(count)):
+        plt.plot (temp[i],y[i],"-+",label='courbe du capteur '+str(i+1))
         plt.title('Courbe de '+colonne)
         plt.legend(loc='best' )
         plt.show ()
@@ -55,23 +93,9 @@ def point1 (KMb,colonne,id,time,start_at,end_at):
 
     
 
-
 def point2 (KMb,id,time,colonne): #les données du bruit sont fournies en dBA
     
-    #boucle pour reconnaitre les limites des mesures de chaque capteurs
-    count,k = 0,0
-    count_time1=[0]
-    count_time2=[]
-        
-    for i in range(len (KMb[time])):
-        if KMb[id][i] != KMb[id][count_time1[count]]:
-            count += 1
-            count_time1.append(i)
-            count_time2.append(i-1)
-    count_time2.append(len(KMb[time])-1)
-    
     #calcul du minimum
-    
     min_bruit = []
     for j in range(len(count_time1)):
         m = KMb[colonne][j]
@@ -81,7 +105,6 @@ def point2 (KMb,id,time,colonne): #les données du bruit sont fournies en dBA
         min_bruit.append(m)
     
     #calcul du maximum
-    
     max_bruit = []
     for j in range(len(count_time1)):
         M = KMb[colonne][j]
@@ -91,7 +114,6 @@ def point2 (KMb,id,time,colonne): #les données du bruit sont fournies en dBA
         max_bruit.append(M)
     
     #calcul de l'écart-type
-    
     moy=[]
     for j in range(len(count_time1)):
         a = 0
@@ -196,8 +218,35 @@ def point2 (KMb,id,time,colonne): #les données du bruit sont fournies en dBA
         print ("L'ecart-type des données récoltées est",ect)
         print ("La variance est de",V)
         print ('La valeur médiane captée est de',moygeo)
-        
         point1(KMb,colonne,id,time,'2019-08-11','2019-08-25')
+
+
+
+def point3 (KMb,id,time) :
+    THx = pd.read_csv ('Humidex.csv' , sep=';')
+    count_time()
+    Hr1 = KMb['humidity']
+    T1 = KMb['temp']
+    Hr2 = []
+    T2 = []
+    
+    
+    for k in range (7880) :
+        if (Hr1[k] * (10 ** (- 1)) % 1) < 0.5 :
+            Hr2.append ((Hr1[k] * (10 ** (-1)) // 1) *10)
+        else :
+            Hr2.append (((Hr1[k] * (10 ** (-1)) // 1) + 1) *10)
+        if T1[k] < 23 :
+            T2.append (21)
+        if 25 <= T1[k] < 27.5 :
+            T2.append (25)
+        if T1[k] > 27.5 :
+            if (T1[k] * (10 ** (-1))) % 1 < 0.5 :
+                T2.append ((T1[k] * (10 ** (-1)) // 1) * 10)
+            else :
+                T2.append (((T1[k] * (10 ** (-1)) // 1) + 1) * 10)
+
+
 
 #EXECUTION du programme:
 a=sys.argv
