@@ -23,6 +23,7 @@ def count_time (KMb,id,time):
     count_time2=[]
         
     for i in range(len (KMb[time])):
+        
         if KMb[id][i] != KMb[id][count_time1[count]]:
             count_time1.append(i)
             count += 1
@@ -34,60 +35,52 @@ def count_time (KMb,id,time):
 
 
 # pouvoir définir les limites du temps les fonctions du temps nécéssaire
-def Temps(KMb,id,time,start_at,end_at):
+def Temps(KMb,id,time,start_at,end_at,count_time):
     
     Temp = []
-    count1,count2 = count_time (KMb,id,time)[0],count_time (KMb,id,time)[1]
     j=0
     
     for i in range(len (KMb[time])): #idée de base créer une boucle pour representer le temps, ici idée est de pouvoir exprimer le départ et l'arrivée du temps
-        if start_at == KMb[time][i][:10] and KMb[time][count1[j]][:19]==KMb[time][i][:19]:
+        if start_at == KMb[time][i][:10] and KMb[time][count_time [0][j]][:19]==KMb[time][i][:19]:
             l=i
             k=0
             print(j)
             
-        elif end_at== KMb[time][i][:10] and KMb[time][count2[j]][:19]==KMb[time][i][:19]:
+        elif end_at == KMb[time][i][:10] and KMb[time][count_time [1][j]][:19]==KMb[time][i][:19]:
             Temp.append([])
-            Temp.append( KMb[time][l] )
             
             while KMb[time][l][:10] != end_at:
-                Temp.append(k)
+                Temp[j].append(k)
                 k += 1
-            
+                l+=1
             j+=1
     return Temp
 
 
 
 
-def point1 (KMb,colonne,id,time,start_at,end_at):
+def point1 (KMb,colonne,id,time,start_at,end_at,f1,f2):
     
-    j = 0
     y = []
-    temp = Temps(KMb,id,time,start_at,end_at)[0]
-    count1,count2 = count_time (KMb,id,time)[0],count_time (KMb,id,time)[1]
+    j=0
     
-    for i in range(len (KMb[time])): #idée de base créer une boucle pour representer le temps, ici idée est de pouvoir exprimer le départ et l'arrivée du temps
-        if start_at == KMb[time][i][:10] and KMb[time][count[j]][:19]==KMb[time][i][:19]:
-            l=i
-            k=0
-            print(j)
-            
-        elif end_at== KMb[time][i][:10] and KMb[time][count[j]][:19]==KMb[time][i][:19]:
-            y.append([])
-            y[j].append( KMb[colonne][l] )
-            
-            while KMb[time][l][:10] != end_at:
-                k += 1
-                l += 1
-                y[j].append (KMb[colonne][l])
-                
-            j+=1
+    for i in range(len(f2)):
+        y.append([])
+        for j in f2[i]:
+            y[i].append(KMb[colonne][f1[0][i]+j])
+    for i in range (len(y)):
+        print (len(y[i]),len(f2[i]),f1)
     
-    for i in range(len(count)):
-        plt.plot (temp[i],y[i],"-+",label='courbe du capteur '+str(i+1))
+    return y
+
+
+
+def courbe_1 ( f1, f2, colonne, txt_additionnel ):
+    
+    for i in range(len(f1)):
+        plt.plot (f1[i],f2[i],"-+",label='courbe du capteur '+str(i+1))
         plt.title('Courbe de '+colonne)
-        plt.legend(loc='best' )
+        plt.legend( loc='best' )
         plt.show ()
     
 
