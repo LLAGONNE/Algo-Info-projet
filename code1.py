@@ -13,14 +13,14 @@ KMb=KM.sort_values(by='id')
 
 
 
-# compter les limites pour le passage entre les capteurs pour toute les fonctions
+# compter les limites en terme de valeurs de chaque capteurs pour pour le passage entre les capteurs pour toute les fonctions
 def count_time (KMb,id,time):
     
     y = []
     Temps = []
     k,j,count = 0,0,0
-    count_time1=[0]
-    count_time2=[]
+    count_time1=[0] #définition du 1er élément qui est forcément 0 (on pose cette liste en tant que liste des éléments inférieurs)
+    count_time2=[] #définition du 1er élément qui est forcément vide (on pose cette liste en tant que liste des éléments supérieurs)
         
     for i in range(len (KMb[time])):
         
@@ -29,24 +29,24 @@ def count_time (KMb,id,time):
             count += 1
             count_time2.append(i-1)
     count_time2.append(len(KMb[time])-1)
-    #print (count_time1, count_time2)
+    #On pose le dernier élément de la liste count_time2 qui correspond à la longueur de la liste
     return count_time1,count_time2
 
 
 
-# pouvoir définir les limites du temps les fonctions du temps nécéssaire
-def Temps(KMb,id,time,start_at,end_at,count_time):
+# pouvoir créer des listes de temps ou chaque temps est représenté en points
+def Temps(KMb,id,time,start_at,end_at,f1):
     
     Temp = []
     j=0
     
     for i in range(len (KMb[time])): #idée de base créer une boucle pour representer le temps, ici idée est de pouvoir exprimer le départ et l'arrivée du temps
-        if start_at == KMb[time][i][:10] and KMb[time][count_time [0][j]][:19]==KMb[time][i][:19]:
+        if start_at == KMb[time][i][:10] and KMb[time][f1 [0][j]][:19]==KMb[time][i][:19]:
             l=i
             k=0
-            print(j)
+            # print(j)
             
-        elif end_at == KMb[time][i][:10] and KMb[time][count_time [1][j]][:19]==KMb[time][i][:19]:
+        elif end_at == KMb[time][i][:10] and KMb[time][f1 [1][j]][:19]==KMb[time][i][:19]:
             Temp.append([])
             
             while KMb[time][l][:10] != end_at:
@@ -68,13 +68,11 @@ def point1 (KMb,colonne,id,time,start_at,end_at,f1,f2):
         y.append([])
         for j in f2[i]:
             y[i].append(KMb[colonne][f1[0][i]+j])
-    for i in range (len(y)):
-        print (len(y[i]),len(f2[i]),f1)
-    
+        
     return y
 
 
-
+    
 def courbe_1 ( f1, f2, colonne, txt_additionnel ):
     
     for i in range(len(f1)):
@@ -82,47 +80,48 @@ def courbe_1 ( f1, f2, colonne, txt_additionnel ):
         plt.title('Courbe de '+colonne)
         plt.legend( loc='best' )
         plt.show ()
-    
 
-    
 
-def point2 (KMb,id,time,colonne): #les données du bruit sont fournies en dBA
+
+
+
+def point2 (KMb,id,time,colonne,f1): #les données du bruit sont fournies en dBA
     
     #calcul du minimum
     min_bruit = []
-    for j in range(len(count_time1)):
+    for j in range(len(f1[0])):
         m = KMb[colonne][j]
-        for k in range (count_time1[j],count_time2[j]) :
+        for k in range (f1[0][j],f1[1][j]) : #boucle permettant d'avoir 
             if KMb[colonne][k] < m :
                 m = KMb[colonne][k]
         min_bruit.append(m)
     
     #calcul du maximum
     max_bruit = []
-    for j in range(len(count_time1)):
+    for j in range(len(f1[0])):
         M = KMb[colonne][j]
-        for k in range (count_time1[j],count_time2[j]) :
+        for k in range (f1[0][j],f1[1][j]) :
             if KMb[colonne][k] > M :
                 M = KMb[colonne][k]
         max_bruit.append(M)
     
-    #calcul de l'écart-type
+    #calcul de l'écart-type, on passe par la moyenne arithmétique
     moy=[]
-    for j in range(len(count_time1)):
+    for j in range(len(f1[0])):
         a = 0
-        for k in range (count_time1[j],count_time2[j]) :
+        for k in range (f1[0][j],f1[1][j]) :
             a += KMb[colonne][k]
-        a = a / (count_time2[j] - count_time1[j]) #on obtient la moyenne arithmétique
+        a = a / (f1[1][j] - f1[0][j]) #on obtient la moyenne arithmétique
         moy.append(a)
     
     
     l=0
     ect=[]
-    for j in range(len(count_time1)):
+    for j in range(len(f1[0])):
         b = 0
-        for k in range (count_time1[j],count_time2[j]) : 
+        for k in range (f1[0][j],f1[1][j]) : 
             b += (abs (KMb[colonne][k] - moy[l])) ** 2
-        ect.append( (b / (count_time2[j] - count_time1[j])) ** (1/2))
+        ect.append( (b / (f1[1][j] - f1[0][j])) ** (1/2))
         l+=1
     
     #calcul de la variance
@@ -135,11 +134,11 @@ def point2 (KMb,id,time,colonne): #les données du bruit sont fournies en dBA
     #on va d'abord trier cette liste avec le tri par insertion par exemple
     L=[]
     med=[]
-    for j in range(len(count_time1)):
+    for j in range(len(f1[0])):
 
         L.append([])
         
-        for k in range (count_time1[j],count_time2[j]) :
+        for k in range (f1[0][j],f1[1][j]) :
             L[j].append (KMb[colonne][k])
         
         for i in range (1,len(L[j])) :
@@ -159,72 +158,101 @@ def point2 (KMb,id,time,colonne): #les données du bruit sont fournies en dBA
         #on va maintenant faire la moyenne logarithmique
         d = 0
         moylog=[]
-        for j in range(len(count_time1)):
+        for j in range(len(f1[0])):
             d = 0
-            for k in range (count_time1[j],count_time2[j]) : 
+            for k in range (f1[0][j],f1[1][j]) : 
                 d += 10 ** ( (KMb['noise'][k]) /10)
-            moylog.append(10 * log10 (d / (count_time2[j] - count_time1[j]) ))
+            moylog.append(10 * log10 (d / (f1[1][j] - f1[0][j]) ))
                 
         
-        print ('Le bruit minimal capté est',min_bruit,'dBA.')
-        print ('Le bruit maximal capté est',max_bruit,'dBA.')
-        print ('La moyenne des valeurs est',moy,'dBA')
-        print ("L'ecart-type des données récoltées est",ect,'dBA.')
-        print ("La variance est de", V ,'dBA.')
-        print ('Le bruit médian capté est de',moylog,'dBA.')
+        # print ('Le bruit minimal capté est pour chacun des 6 capteurs:',min_bruit,'dBA.')
+        # print ('Le bruit maximal capté est pour chacun des 6 capteurs:',max_bruit,'dBA.')
+        # print ('La moyenne des valeurs est pour chacun des 6 capteurs:',moy,'dBA')
+        # print ("L'ecart-type des données récoltées est pour chacun des 6 capteurs:",ect,'dBA.')
+        # print ("La variance est pour chacun des 6 capteurs:", V ,'dBA.')
+        # print ('Le bruit médian capté est pour chacun des 6 capteurs:',moylog,'dBA.')
+        return min_bruit , max_bruit , moy , ect , V , moylog
         
-        point1(KMb,colonne,id,time,'2019-08-11','2019-08-25')
         
     if colonne == 'temp' or colonne == 'lum' or colonne == 'co2' :
         #on va maintenant faire la moyenne arithmétique
         d = 0
         moyari=[]
-        for j in range(len(count_time1)):
+        for j in range(len(f1[0])):
             d = 0
-            for k in range (count_time1[j],count_time2[j]) : 
+            for k in range (f1[0][j],f1[1][j]) : 
                 d += KMb[colonne][k]
-            moyari.append(d/(count_time2[j] - count_time1[j]))
+            moyari.append(d/(f1[1][j] - f1[0][j]))
         
         
-        print ('La valeur minimale captée est',min_bruit)
-        print ('La valeur maximale captée est',max_bruit)
-        print ('La valeur moyenne est',moy)
-        print ("L'ecart-type des données récoltées est",ect)
-        print ("La variance est de",V)
-        print ('La valeur médiane captée est de',moyari)
-        plt.text('La valeur minimale captée est' + str(min_bruit) + 'La valeur maximale captée est' + str(max_bruit) + 'La valeur moyenne est' +str(moy) + "L'ecart-type des données récoltées est" + str(ect) + "La variance est de" + str(V) + 'La valeur médiane captée est de'+str(moyari))
-        point1(KMb,colonne,id,time,'2019-08-11','2019-08-25')
+        # print ('La valeur minimale captée est pour chacun des 6 capteurs:',min_bruit)
+        # print ('La valeur maximale captée est pour chacun des 6 capteurs:',max_bruit)
+        # print ('La valeur moyenne est pour chacun des 6 capteurs:',moy)
+        # print ("L'ecart-type des données récoltées est pour chacun des 6 capteurs:",ect)
+        # print ("La variance est de pour chacun des 6 capteurs:",V)
+        # print ('La valeur médiane captée est de pour chacun des 6 capteurs:',moyari)
+        return min_bruit , max_bruit , moy , ect , V , moyari
         
     if colonne == 'humidity' :
         #on calcule la moyenne géométrique
         d = 0
         moygeo=[]
-        for j in range(len(count_time1)):
+        for j in range(len(f1[0])):
             d = 0
-            for k in range (count_time1[j],count_time2[j]) : 
-                d = d * (KMb['humidity'][k]) ** (1/(count_time2[j] - count_time1[j]))
+            for k in range (f1[0][j],f1[1][j]) : 
+                d = d * (KMb['humidity'][k]) ** (1/(f1[1][j] - f1[0][j]))
             moygeo.append(d)
             
-        print ('La valeur minimale captée est',min_bruit)
-        print ('La valeur maximale captée est',max_bruit,)
-        print ('La valeur moyenne est',moy)
-        print ("L'ecart-type des données récoltées est",ect)
-        print ("La variance est de",V)
-        print ('La valeur médiane captée est de',moygeo)
-        point1(KMb,colonne,id,time,'2019-08-11','2019-08-25')
+        # print ('La valeur minimale captée est',min_bruit)
+        # print ('La valeur maximale captée est',max_bruit,)
+        # print ('La valeur moyenne est',moy)
+        # print ("L'ecart-type des données récoltées est",ect)
+        # print ("La variance est de",V)
+        # print ('La valeur médiane captée est de pour chacun des 6 capteurs:',moygeo)
+        return min_bruit , max_bruit , moy , ect , V , moygeo
 
 
 
-def point3 (KMb,id,time) :
+def courbe_2 ( f1, f2, point2, colonne):
+    cmap = plt.get_cmap('jet_r')
+    min=[]
+    max=[]
+    plt.subplot(121)
+    for i in range(len(f1)):
+        min.append([])
+        max.append([])
+        for j in range(len(f1[i])):
+            min[i].append(point2[0][i])
+            max[i].append(point2[1][i])
+        color = cmap(float(i)/len(f1))
+        print(min[i][0],max[i][0])
+        plt.plot (f1[i], min[i], c=color)
+        plt.plot (f1[i], max[i], c=color)
+        plt.plot (f1[i], f2[i], "-+", c=color,label='courbe (+ min et max) du capteur '+str(i+1))
+        plt.xlabel('temps (en nombre de points depuis date du début)')
+        plt.ylabel('valeurs de ')
+        plt.title ('Courbe de '+colonne)
+        plt.legend()
+    plt.subplot(122)
+    for i in range(len(f1)): #il faudra réussier à séparer les divers barres (couleurs ex)
+        plt.bar(range(1,len(point2[2])+1),point2[2],width=0.2)
+        plt.bar(range(1,len(point2[3])+1),point2[3],width=0.1)
+        plt.bar(range(1,len(point2[4])+1),point2[4],width=0.8)
+        plt.bar(range(1,len(point2[5])+1),point2[5],width=0.3)
+        
+    plt.show()
+
+
+
+def point3 (KMb,id,f1,f2) : #Ici f1 désigne le temps et f2 désigne la limite au niveau de la position des divers capteurs (voir la fonction count_time)
     THx = pd.read_csv ('Humidex.csv' , sep=';')
-    count_time()
     Hr1 = KMb['humidity']
     T1 = KMb['temp']
     Hr2 = []
     T2 = []
     
     
-    for k in range (7880) :
+    for k in range (len(T1)) :
         if (Hr1[k] * (10 ** (- 1)) % 1) < 0.5 :
             Hr2.append ((Hr1[k] * (10 ** (-1)) // 1) *10)
         else :
@@ -245,6 +273,7 @@ def point3 (KMb,id,time) :
 a=sys.argv
 def execution(a):
     if a[1]=="display":
-        if a[2]=="humidex" or a[2]=="Humidex":
-            point3()
-            
+        if a[2]=="humidex":
+            return point3()
+        elif a[2]:
+            return a
