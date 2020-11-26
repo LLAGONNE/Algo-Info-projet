@@ -7,10 +7,9 @@ import sys #sys.argv pour permettre de pouvoir entrer les données sur powershel
 
 
 
-KM = pd.read_csv ('EIVP_projet_1\EIVP_KMbis.csv' , sep=';') #il faut remplacer EIVP_projet_1\EIVP_KM.csv par ce qu'on a comme dossier
+KM = pd.read_csv ('EIVP_KMbis.csv' , sep=';') #il faut remplacer EIVP_projet_1\EIVP_KM.csv par ce qu'on a comme dossier
+KMb = KM.sort_values(by='id')
 #print(KMb.tail(60)['sent_at'])  #pour s'assurer que le fichier est bien reconnu par le système
-KMb=KM.sort_values(by='id')
-
 
 
 # compter les limites en terme de valeurs de chaque capteurs pour pour le passage entre les capteurs pour toute les fonctions
@@ -19,16 +18,16 @@ def count_time (KMb,id,time):
     y = []
     Temps = []
     k,j,count = 0,0,0
-    count_time1=[0] #définition du 1er élément qui est forcément 0 (on pose cette liste en tant que liste des éléments inférieurs)
-    count_time2=[] #définition du 1er élément qui est forcément vide (on pose cette liste en tant que liste des éléments supérieurs)
+    count_time1 = [0] #définition du 1er élément qui est forcément 0 (on pose cette liste en tant que liste des éléments inférieurs)
+    count_time2 = [] #définition du 1er élément qui est forcément vide (on pose cette liste en tant que liste des éléments supérieurs)
         
     for i in range(len (KMb[time])):
         
         if KMb[id][i] != KMb[id][count_time1[count]]:
-            count_time1.append(i)
+            count_time1.append (i)
             count += 1
-            count_time2.append(i-1)
-    count_time2.append(len(KMb[time])-1)
+            count_time2.append (i - 1)
+    count_time2.append (len (KMb[time]) - 1)
     #On pose le dernier élément de la liste count_time2 qui correspond à la longueur de la liste
     return count_time1,count_time2
 
@@ -38,22 +37,22 @@ def count_time (KMb,id,time):
 def Temps(KMb,id,time,start_at,end_at,f1):
     
     Temp = []
-    j=0
+    j = 0
     
     for i in range(len (KMb[time])): #idée de base créer une boucle pour representer le temps, ici idée est de pouvoir exprimer le départ et l'arrivée du temps
-        if start_at == KMb[time][i][:10] and KMb[time][f1 [0][j]][:19]==KMb[time][i][:19]:
-            l=i
-            k=0
+        if start_at == KMb[time][i][:10] and KMb[time][f1 [0][j]][:19] == KMb[time][i][:19]:
+            l = i
+            k = 0
             # print(j)
             
-        elif end_at == KMb[time][i][:10] and KMb[time][f1 [1][j]][:19]==KMb[time][i][:19]:
-            Temp.append([])
+        elif end_at == KMb[time][i][:10] and KMb[time][f1 [1][j]][:19] == KMb[time][i][:19]:
+            Temp.append ([])
             
             while KMb[time][l][:10] != end_at:
-                Temp[j].append(k)
+                Temp[j].append (k)
                 k += 1
-                l+=1
-            j+=1
+                l += 1
+            j += 1
     return Temp
 
 
@@ -62,12 +61,12 @@ def Temps(KMb,id,time,start_at,end_at,f1):
 def point1 (KMb,colonne,id,time,start_at,end_at,f1,f2):
     
     y = []
-    j=0
+    j = 0
     
-    for i in range(len(f2)):
-        y.append([])
+    for i in range (len (f2)) :
+        y.append ([])
         for j in f2[i]:
-            y[i].append(KMb[colonne][f1[0][i]+j])
+            y[i].append (KMb[colonne][f1[0][i]+j])
         
     return y
 
@@ -75,10 +74,10 @@ def point1 (KMb,colonne,id,time,start_at,end_at,f1,f2):
     
 def courbe_1 ( f1, f2, colonne, txt_additionnel ):
     
-    for i in range(len(f1)):
-        plt.plot (f1[i],f2[i],"-+",label='courbe du capteur '+str(i+1))
-        plt.title('Courbe de '+colonne)
-        plt.legend( loc='best' )
+    for i in range (len (f1)) :
+        plt.plot (f1[i],f2[i],"-+",label = 'courbe du capteur '+str (i + 1))
+        plt.title ('Courbe de '+colonne)
+        plt.legend (loc='best')
         plt.show ()
 
 
@@ -89,54 +88,54 @@ def point2 (KMb,id,time,colonne,f1): #les données du bruit sont fournies en dBA
     
     #calcul du minimum
     min_bruit = []
-    for j in range(len(f1[0])):
+    for j in range (len (f1[0])) :
         m = KMb[colonne][j]
         for k in range (f1[0][j],f1[1][j]) : #boucle permettant d'avoir 
             if KMb[colonne][k] < m :
                 m = KMb[colonne][k]
-        min_bruit.append(m)
+        min_bruit.append (m)
     
     #calcul du maximum
     max_bruit = []
-    for j in range(len(f1[0])):
+    for j in range (len (f1[0])) :
         M = KMb[colonne][j]
         for k in range (f1[0][j],f1[1][j]) :
             if KMb[colonne][k] > M :
                 M = KMb[colonne][k]
-        max_bruit.append(M)
+        max_bruit.append (M)
     
     #calcul de l'écart-type, on passe par la moyenne arithmétique
-    moy=[]
-    for j in range(len(f1[0])):
+    moy = []
+    for j in range (len (f1[0])) :
         a = 0
         for k in range (f1[0][j],f1[1][j]) :
             a += KMb[colonne][k]
         a = a / (f1[1][j] - f1[0][j]) #on obtient la moyenne arithmétique
-        moy.append(a)
+        moy.append (a)
     
     
-    l=0
-    ect=[]
-    for j in range(len(f1[0])):
+    l = 0
+    ect = []
+    for j in range (len (f1[0])) :
         b = 0
         for k in range (f1[0][j],f1[1][j]) : 
             b += (abs (KMb[colonne][k] - moy[l])) ** 2
-        ect.append( (b / (f1[1][j] - f1[0][j])) ** (1/2))
-        l+=1
+        ect.append ( (b / (f1[1][j] - f1[0][j])) ** (1/2))
+        l += 1
     
     #calcul de la variance
-    V=[]
-    for i in ect:
-        V.append( i ** 2 )
+    V = []
+    for i in ect :
+        V.append ( i ** 2 )
     
     
     #calcul de la médiane
     #on va d'abord trier cette liste avec le tri par insertion par exemple
-    L=[]
-    med=[]
-    for j in range(len(f1[0])):
+    L = []
+    med = []
+    for j in range (len (f1[0])) :
 
-        L.append([])
+        L.append ([])
         
         for k in range (f1[0][j],f1[1][j]) :
             L[j].append (KMb[colonne][k])
@@ -149,20 +148,20 @@ def point2 (KMb,id,time,colonne,f1): #les données du bruit sont fournies en dBA
                 m = m - 1
             L[j][m] = x
         if len (L[j]) % 2 == 0 :
-            med.append( (L[j][len (L[j]) // 2] + L[j][len (L[j]) // 2 + 1]) / 2)
+            med.append ( (L[j][len (L[j]) // 2] + L[j][len (L[j]) // 2 + 1]) / 2)
         else :
-            med.append(L[j][len (L[j]) // 2 + 1])
+            med.append (L[j][len (L[j]) // 2 + 1])
         
 #on différencie maintenant suivant chaque colonne
     if colonne == 'noise' :
         #on va maintenant faire la moyenne logarithmique
         d = 0
-        moylog=[]
-        for j in range(len(f1[0])):
+        moylog = []
+        for j in range (len (f1[0])) :
             d = 0
             for k in range (f1[0][j],f1[1][j]) : 
                 d += 10 ** ( (KMb['noise'][k]) /10)
-            moylog.append(10 * log10 (d / (f1[1][j] - f1[0][j]) ))
+            moylog.append (10 * log10 (d / (f1[1][j] - f1[0][j]) ))
                 
         
         # print ('Le bruit minimal capté est pour chacun des 6 capteurs:',min_bruit,'dBA.')
@@ -177,12 +176,12 @@ def point2 (KMb,id,time,colonne,f1): #les données du bruit sont fournies en dBA
     if colonne == 'temp' or colonne == 'lum' or colonne == 'co2' :
         #on va maintenant faire la moyenne arithmétique
         d = 0
-        moyari=[]
-        for j in range(len(f1[0])):
+        moyari = []
+        for j in range (len (f1[0])) :
             d = 0
             for k in range (f1[0][j],f1[1][j]) : 
                 d += KMb[colonne][k]
-            moyari.append(d/(f1[1][j] - f1[0][j]))
+            moyari.append (d/(f1[1][j] - f1[0][j]))
         
         
         # print ('La valeur minimale captée est pour chacun des 6 capteurs:',min_bruit)
@@ -196,12 +195,12 @@ def point2 (KMb,id,time,colonne,f1): #les données du bruit sont fournies en dBA
     if colonne == 'humidity' :
         #on calcule la moyenne géométrique
         d = 0
-        moygeo=[]
-        for j in range(len(f1[0])):
+        moygeo = []
+        for j in range (len (f1[0])) :
             d = 0
             for k in range (f1[0][j],f1[1][j]) : 
                 d = d * (KMb['humidity'][k]) ** (1/(f1[1][j] - f1[0][j]))
-            moygeo.append(d)
+            moygeo.append (d)
             
         # print ('La valeur minimale captée est',min_bruit)
         # print ('La valeur maximale captée est',max_bruit,)
@@ -215,32 +214,32 @@ def point2 (KMb,id,time,colonne,f1): #les données du bruit sont fournies en dBA
 
 def courbe_2 ( f1, f2, point2, colonne):
     cmap = plt.get_cmap('jet_r')
-    min=[]
-    max=[]
-    plt.subplot(121)
-    for i in range(len(f1)):
-        min.append([])
-        max.append([])
-        for j in range(len(f1[i])):
-            min[i].append(point2[0][i])
-            max[i].append(point2[1][i])
-        color = cmap(float(i)/len(f1))
-        print(min[i][0],max[i][0])
-        plt.plot (f1[i], min[i], c=color)
-        plt.plot (f1[i], max[i], c=color)
-        plt.plot (f1[i], f2[i], "-+", c=color,label='courbe (+ min et max) du capteur '+str(i+1))
-        plt.xlabel('temps (en nombre de points depuis date du début)')
-        plt.ylabel('valeurs de ')
-        plt.title ('Courbe de '+colonne)
-        plt.legend()
-    plt.subplot(122)
-    for i in range(len(f1)): #il faudra réussier à séparer les divers barres (couleurs ex)
-        plt.bar(range(1,len(point2[2])+1),point2[2],width=0.2)
-        plt.bar(range(1,len(point2[3])+1),point2[3],width=0.1)
-        plt.bar(range(1,len(point2[4])+1),point2[4],width=0.8)
-        plt.bar(range(1,len(point2[5])+1),point2[5],width=0.3)
+    min = []
+    max = []
+    plt.subplot (121)
+    for i in range (len (f1)) :
+        min.append ([])
+        max.append ([])
+        for j in range (len (f1[i])) :
+            min[i].append (point2[0][i])
+            max[i].append (point2[1][i])
+        color = cmap (float (i) / len (f1))
+        print (min[i][0] , max[i][0])
+        plt.plot (f1[i] , min[i], c = color)
+        plt.plot (f1[i] , max[i], c = color)
+        plt.plot (f1[i] , f2[i], "-+", c = color , label = 'courbe (+ min et max) du capteur ' + str (i + 1))
+        plt.xlabel ('temps (en nombre de points depuis date du début)')
+        plt.ylabel ('valeurs de ')
+        plt.title ('Courbe de ' + colonne)
+        plt.legend ()
+    plt.subplot (122)
+    for i in range (len (f1)) : #il faudra réussier à séparer les divers barres (couleurs ex)
+        plt.bar (range (1 , len (point2[2]) + 1) , point2[2] , width = 0.2)
+        plt.bar (range (1 , len (point2[3]) + 1) , point2[3] , width = 0.1)
+        plt.bar (range (1 , len (point2[4]) + 1) , point2[4] , width = 0.8)
+        plt.bar (range (1 , len (point2[5]) + 1) , point2[5] , width = 0.3)
         
-    plt.show()
+    plt.show ()
 
 
 
@@ -250,9 +249,10 @@ def point3 (KMb,id,f1,f2) : #Ici f1 désigne le temps et f2 désigne la limite a
     T1 = KMb['temp']
     Hr2 = []
     T2 = []
+    Hx = []
     
-    
-    for k in range (len(T1)) :
+    #Dans cette boucle for l'idée est d'attribuer chaque valeur fournie par le document csv initial à la valeur qui lui correspond dans le csv humidex
+    for k in range (len (T1)) :
         if (Hr1[k] * (10 ** (- 1)) % 1) < 0.5 :
             Hr2.append ((Hr1[k] * (10 ** (-1)) // 1) *10)
         else :
@@ -266,9 +266,16 @@ def point3 (KMb,id,f1,f2) : #Ici f1 désigne le temps et f2 désigne la limite a
                 T2.append ((T1[k] * (10 ** (-1)) // 1) * 10)
             else :
                 T2.append (((T1[k] * (10 ** (-1)) // 1) + 1) * 10)
-
-
-
+    #print (Hr2)
+    #print (T2)
+    #Maintenant on va lire la valeur de l'indice humidex pour chaque donnée.
+    for k in range (len (T2)) : #On rappele que T2 et Hr2 sont de même longueur
+        i = str (int (T2[k])) #on veut ici le nom de la colonne que l'on va chercher dans le tableau humidex / certaines valeurs sont également des flottants
+        j = 0 #on va chercher l'indice de la ligne associée
+        while THx.loc[j][0] != int (Hr2[k]) : #car les valeurs de cette ligne sont des flottants
+            j += 1
+        Hx.append (int (THx[i][j])) 
+    print (Hx)
 #EXECUTION du programme:
 a=sys.argv
 def execution(a):
@@ -277,3 +284,7 @@ def execution(a):
             return point3()
         elif a[2]:
             return a
+        
+        
+        
+        
