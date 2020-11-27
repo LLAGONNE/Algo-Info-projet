@@ -120,7 +120,7 @@ def point2 (KMb,id,time,colonne,f1): #les données du bruit sont fournies en dBA
     for j in range(len(f1[0])):
         b = 0
         for k in range (f1[0][j],f1[1][j]) : 
-            b += (abs (KMb[colonne][k] - moy[l])) ** 2
+            b += (abs (KMb[colonne][k] - moy[j])) ** 2
         ect.append( (b / (f1[1][j] - f1[0][j])) ** (1/2))
         l+=1
     
@@ -165,13 +165,13 @@ def point2 (KMb,id,time,colonne,f1): #les données du bruit sont fournies en dBA
             moylog.append(10 * log10 (d / (f1[1][j] - f1[0][j]) ))
                 
         
-        # print ('Le bruit minimal capté est pour chacun des 6 capteurs:',min_bruit,'dBA.')
-        # print ('Le bruit maximal capté est pour chacun des 6 capteurs:',max_bruit,'dBA.')
-        # print ('La moyenne des valeurs est pour chacun des 6 capteurs:',moy,'dBA')
-        # print ("L'ecart-type des données récoltées est pour chacun des 6 capteurs:",ect,'dBA.')
-        # print ("La variance est pour chacun des 6 capteurs:", V ,'dBA.')
-        # print ('Le bruit médian capté est pour chacun des 6 capteurs:',moylog,'dBA.')
-        return min_bruit , max_bruit , moy , ect , V , moylog
+        print ('Le bruit minimal capté est pour chacun des 6 capteurs:',min_bruit,'dBA.')
+        print ('Le bruit maximal capté est pour chacun des 6 capteurs:',max_bruit,'dBA.')
+        print ('La moyenne des valeurs est pour chacun des 6 capteurs:',moy,'dBA')
+        print ("L'ecart-type des données récoltées est pour chacun des 6 capteurs:",ect,'dBA.')
+        print ("La variance est pour chacun des 6 capteurs:", V ,'dBA.')
+        print ('Le bruit médian capté est pour chacun des 6 capteurs:',moylog,'dBA.')
+        return min_bruit , max_bruit , moy , ect , V , moylog, ['min_bruit' , 'max_bruit' , 'moy' , 'ect' , 'V' , 'moyenne logarithmique']
         
         
     if colonne == 'temp' or colonne == 'lum' or colonne == 'co2' :
@@ -185,13 +185,13 @@ def point2 (KMb,id,time,colonne,f1): #les données du bruit sont fournies en dBA
             moyari.append(d/(f1[1][j] - f1[0][j]))
         
         
-        # print ('La valeur minimale captée est pour chacun des 6 capteurs:',min_bruit)
-        # print ('La valeur maximale captée est pour chacun des 6 capteurs:',max_bruit)
-        # print ('La valeur moyenne est pour chacun des 6 capteurs:',moy)
-        # print ("L'ecart-type des données récoltées est pour chacun des 6 capteurs:",ect)
-        # print ("La variance est de pour chacun des 6 capteurs:",V)
-        # print ('La valeur médiane captée est de pour chacun des 6 capteurs:',moyari)
-        return min_bruit , max_bruit , moy , ect , V , moyari
+        print ('La valeur minimale captée est pour chacun des 6 capteurs:',min_bruit)
+        print ('La valeur maximale captée est pour chacun des 6 capteurs:',max_bruit)
+        print ('La valeur moyenne est pour chacun des 6 capteurs:',moy)
+        print ("L'ecart-type des données récoltées est pour chacun des 6 capteurs:",ect)
+        print ("La variance est de pour chacun des 6 capteurs:",V)
+        print ('La valeur médiane captée est de pour chacun des 6 capteurs:',moyari)
+        return min_bruit , max_bruit , moy , ect , V , moyari, ['min_bruit' , 'max_bruit' , 'moy' , 'ect' , 'V' , 'moyenne arithmérique'] 
         
     if colonne == 'humidity' :
         #on calcule la moyenne géométrique
@@ -203,17 +203,19 @@ def point2 (KMb,id,time,colonne,f1): #les données du bruit sont fournies en dBA
                 d = d * (KMb['humidity'][k]) ** (1/(f1[1][j] - f1[0][j]))
             moygeo.append(d)
             
-        # print ('La valeur minimale captée est',min_bruit)
-        # print ('La valeur maximale captée est',max_bruit,)
-        # print ('La valeur moyenne est',moy)
-        # print ("L'ecart-type des données récoltées est",ect)
-        # print ("La variance est de",V)
-        # print ('La valeur médiane captée est de pour chacun des 6 capteurs:',moygeo)
-        return min_bruit , max_bruit , moy , ect , V , moygeo
+        print ('La valeur minimale captée est',min_bruit)
+        print ('La valeur maximale captée est',max_bruit)
+        print ('La valeur moyenne est',moy)
+        print ("L'ecart-type des données récoltées est",ect)
+        print ("La variance est de",V)
+        print ('La valeur médiane captée est de pour chacun des 6 capteurs:',moygeo)
+        return min_bruit , max_bruit , moy , ect , V , moygeo, ['min_bruit' , 'max_bruit' , 'moy' , 'ect' , 'V' , 'moyenne géométrique'] 
 
 
 
-def courbe_2 ( f1, f2, point2, colonne):
+def courbe_2 ( f1, f2, point2, colonne): #A la différence de la courbe_1, ici on fait en sorte d'afficher la 1ere courbe et également les autres courbes sous la forme de 
+    #f1 correspond à la liste de temps sous forme de 
+    #f2 correspond à la limite sur le tableau KMb des divers capteurs
     cmap = plt.get_cmap('jet_r')
     min=[]
     max=[]
@@ -224,35 +226,41 @@ def courbe_2 ( f1, f2, point2, colonne):
         for j in range(len(f1[i])):
             min[i].append(point2[0][i])
             max[i].append(point2[1][i])
-        color = cmap(float(i)/len(f1))
+        color1 = cmap(float(i)/len(f1))
         print(min[i][0],max[i][0])
-        plt.plot (f1[i], min[i], c=color)
-        plt.plot (f1[i], max[i], c=color)
-        plt.plot (f1[i], f2[i], "-+", c=color,label='courbe (+ min et max) du capteur '+str(i+1))
+        plt.plot (f1[i], min[i], c=color1)
+        plt.plot (f1[i], max[i], c=color1)
+        plt.plot (f1[i], f2[i], "-+", c=color1,label='courbe (+ min et max) du capteur '+str(i+1))
         plt.xlabel('temps (en nombre de points depuis date du début)')
         plt.ylabel('valeurs de ')
         plt.title ('Courbe de '+colonne)
         plt.legend()
     plt.subplot(122)
-    for i in range(len(f1)): #il faudra réussier à séparer les divers barres (couleurs ex)
-        plt.bar(range(1,len(point2[2])+1),point2[2],width=0.2)
-        plt.bar(range(1,len(point2[3])+1),point2[3],width=0.1)
-        plt.bar(range(1,len(point2[4])+1),point2[4],width=0.8)
-        plt.bar(range(1,len(point2[5])+1),point2[5],width=0.3)
-        
+    m=[]
+    for l in range(len(point2[2])):
+        m.append([])
+        m[l]=[l/10 for x in range(0,6)]
+        for n in range(len(m[l])):
+            m[l][n]=m[l][n]+n
+    print(m)
+    for i in range(1,len(point2)-1): #il faudra réussier à séparer les divers barres (couleurs ex)
+        color2 = cmap(float(i)/len(f1))
+        plt.bar(m[i], point2[i], width=0.1, color=color2)
+        plt.xlabel("diagramme en barre pour la moyenne, l'écart type, la variance, et la " + point2[6][5] )
     plt.show()
 
 
 
-def point3 (KMb,id,f1,f2) : #Ici f1 désigne le temps et f2 désigne la limite au niveau de la position des divers capteurs (voir la fonction count_time)
+def point3 (KMb,id,time,f1) :
     THx = pd.read_csv ('Humidex.csv' , sep=';')
+    count_time()
     Hr1 = KMb['humidity']
     T1 = KMb['temp']
     Hr2 = []
     T2 = []
     
     
-    for k in range (len(T1)) :
+    for k in range (len(Hr1)) :
         if (Hr1[k] * (10 ** (- 1)) % 1) < 0.5 :
             Hr2.append ((Hr1[k] * (10 ** (-1)) // 1) *10)
         else :
