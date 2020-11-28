@@ -22,7 +22,7 @@ def count_time (KMb,id,time):
     count_time1=[0] #définition du 1er élément qui est forcément 0 (on pose cette liste en tant que liste des éléments inférieurs)
     count_time2=[] #définition du 1er élément qui est forcément vide (on pose cette liste en tant que liste des éléments supérieurs)
         
-    for i in range(len (KMb[time])):
+    for i in range(len (KMb[time])): #but de la boucle: permettre de lire les id limites des capteurs et de les enregistrer sur une liste
         
         if KMb[id][i] != KMb[id][count_time1[count]]:
             count_time1.append(i)
@@ -59,9 +59,9 @@ def Temps(KMb,id,time,start_at,end_at,f1):
 
 
 
-def point1 (KMb,colonne,id,time,start_at,end_at,f1,f2):
+def point1 ( KMb, colonne, id,time, start_at, end_at, f1, f2 ): #fonction très courte permettant de mettre les éléments du dataframe KMb au sein d'une concaténation de listes
     
-    y = []
+    y = [] 
     j=0
     
     for i in range(len(f2)):
@@ -73,7 +73,7 @@ def point1 (KMb,colonne,id,time,start_at,end_at,f1,f2):
 
 
     
-def courbe_1 ( f1, f2, colonne, txt_additionnel ):
+def courbe_1 ( f1, f2, colonne ):
     
     for i in range(len(f1)):
         plt.plot (f1[i],f2[i],"-+",label='courbe du capteur '+str(i+1))
@@ -220,6 +220,7 @@ def courbe_2 ( f1, f2, point2, colonne): #A la différence de la courbe_1, ici o
     min=[]
     max=[]
     plt.subplot(121)
+    
     for i in range(len(f1)):
         min.append([])
         max.append([])
@@ -235,18 +236,23 @@ def courbe_2 ( f1, f2, point2, colonne): #A la différence de la courbe_1, ici o
         plt.ylabel('valeurs de ')
         plt.title ('Courbe de '+colonne)
         plt.legend()
+        
     plt.subplot(122)
     m=[]
+    
     for l in range(len(point2[2])):
         m.append([])
         m[l]=[l/10 for x in range(0,6)]
         for n in range(len(m[l])):
             m[l][n]=m[l][n]+n
+            
     print(m)
+    
     for i in range(1,len(point2)-1): #il faudra réussier à séparer les divers barres (couleurs ex)
         color2 = cmap(float(i)/len(f1))
         plt.bar(m[i], point2[i], width=0.1, color=color2)
         plt.xlabel("diagramme en barre pour la moyenne, l'écart type, la variance, et la " + point2[6][5] )
+        
     plt.show()
 
 
@@ -275,6 +281,10 @@ def point3 (KMb,id,time,f1) :
             else :
                 T2.append (((T1[k] * (10 ** (-1)) // 1) + 1) * 10)
 
+
+
+def erreur():
+    return None
 
 
 #EXECUTION du programme:
