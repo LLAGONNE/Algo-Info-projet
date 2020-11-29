@@ -315,17 +315,57 @@ def point4 (KMb, colonne1, colonne2, id, time, f1) :
         corr.append (cov[i] / (ect1[i] * ect2[i]))
     return (corr)
 
+
+def loc1 (KMb, f1, a, b, colonne) :
+    ect_loc = 0
+    moy = 0
+    for k in range (a, b) :
+        moy += KMb[colonne][k]
+    moy /= b - a + 1
     
-def anomalie (KMb, time, start_at, end_at, f1, f2, f4, colonne) :
+    c = 0
+    for k in range (a, b) :
+        c += (KMb[colonne][k] - moy) ** 2
+    ect_loc = (c / (b - a + 1)) ** (1/2)
+    return (ect_loc)
+   
+def loc2 (KMb, f1, a, b, colonne) :
+    
+    L= []
+    
+    for k in range (a, b) :
+        L.append (KMb[colonne][k])
+    for i in range (1, len (L)) :
+        x = L[i]
+        m = i     
+        while m > 0 and x < L[m - 1] :
+            L[m] = L[m - 1]
+            m = m - 1
+        L[m] = x
+    if len (L) % 2 == 0 :
+        med_loc = (L[len (L) // 2] + L[len (L) // 2 + 1]) / 2
+    else :
+        med_loc = L[len (L) // 2 + 1]
+    return (med_loc)
+    
+
+
+    
+def anomalie (KMb, time, start_at, end_at, f1, f2, colonne) :
     ind_anomalie = []
     med_loc = 0
     ect_loc = 0
-    for i in range (len (f1[1])) :
-        for j in range (25 + f1[0][i], f1[1][i] - 26) :
-            med_loc = f4[5]
-            ect_loc = f4[3]
-            if KMb[colonne][j] < (med_loc[i] + 0.5 * ect_loc[i]) or KMb[colonne][j] > (med_loc[i] + 0.5 * ect_loc[i]) :
+    for i in range (len (f1[1])) : #l nombre de capteurs
+        y = f1[0][i]
+        z = f1[1][i]
+        for j in range (15 + y, z - 16) : 
+            med_loc = loc2 (KMb, count_time (KMb, 'id', time), j - 15, j + 16, colonne)
+            ect_loc = loc1 (KMb, count_time (KMb, 'id', time), j - 15, j + 16, colonne)
+            #print (med_loc)
+            #print (ect_loc)
+            if KMb[colonne][j] > (med_loc + 0.5 * ect_loc) or KMb[colonne][j] < (med_loc - 0.5 * ect_loc) :
                 ind_anomalie.append (j)
+                
     return (ind_anomalie)
     
 
