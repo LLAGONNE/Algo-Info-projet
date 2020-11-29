@@ -169,7 +169,7 @@ def point2 (KMb, id, time, colonne, f1) : #les données du bruit sont fournies e
         #print ("La variance est pour chacun des 6 capteurs:", V, 'dBA.')
         #print ('Le bruit médian capté est pour chacun des 6 capteurs:', moylog, 'dBA.')
         
-        return min_, max_, moy, ect, V, moylog, ['min_', 'max_', 'moy', 'ect', 'V', 'moyenne logarithmique']
+        return min_, max_, moylog, ect, V, med, ['min_', 'max_', 'moyenne logarithmique', 'ect', 'V', 'médiane']
         
         
     if colonne == 'temp' or colonne == 'lum' or colonne == 'co2' :
@@ -190,7 +190,7 @@ def point2 (KMb, id, time, colonne, f1) : #les données du bruit sont fournies e
         #print ("La variance est de pour chacun des 6 capteurs:", V)
         #print ('La valeur médiane captée est de pour chacun des 6 capteurs:', moyari)
         
-        return min_, max_, moy , ect, V, moyari, ['min_', 'max_', 'moy', 'ect', 'V', 'moyenne arithmérique'] 
+        return min_, max_, moyari , ect, V, med, ['min_', 'max_', 'moy', 'ect', 'V', 'médiane'] 
         
     if colonne == 'humidity' :
         #on calcule la moyenne géométrique
@@ -210,7 +210,7 @@ def point2 (KMb, id, time, colonne, f1) : #les données du bruit sont fournies e
         #print ("La variance est de", V)
         #print ('La valeur médiane captée est de pour chacun des 6 capteurs:', moygeo)
         
-        return min_, max_, moy, ect, V, moygeo, ['min_', 'max_', 'moy', 'ect', 'V', 'moyenne géométrique'] 
+        return min_, max_, moygeo, ect, V, med, ['min_', 'max_', 'moygeo', 'ect', 'V', 'médiane'] 
 
 
 
@@ -293,7 +293,7 @@ def point3 (KMb, id, time, f1) :
     print (Hx)
     
     
-def point4 (KMb, colonne1, colonne2, id, time, f1):
+def point4 (KMb, colonne1, colonne2, id, time, f1) :
     
     moy1 = point2 (KMb, 'id', time, colonne1, f1)[2]
     moy2 = point2 (KMb, 'id', time, colonne2, f1)[2]
@@ -316,7 +316,18 @@ def point4 (KMb, colonne1, colonne2, id, time, f1):
     return (corr)
 
     
-
+def anomalie (KMb, time, start_at, end_at, f1, f2, f4, colonne) :
+    ind_anomalie = []
+    med_loc = 0
+    ect_loc = 0
+    for i in range (len (f1[1])) :
+        for j in range (25 + f1[0][i], f1[1][i] - 26) :
+            med_loc = f4[5]
+            ect_loc = f4[3]
+            if KMb[colonne][j] < (med_loc[i] + 0.5 * ect_loc[i]) or KMb[colonne][j] > (med_loc[i] + 0.5 * ect_loc[i]) :
+                ind_anomalie.append (j)
+    return (ind_anomalie)
+    
 
 
 
