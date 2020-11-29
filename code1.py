@@ -1,21 +1,19 @@
-#J'importe les 5 bibliothèques utiles à la résolution des problèmes:
+#J'importe les 4 bibliothèques utiles à la résolution des problèmes:
 import pandas as pd
 import matplotlib.pyplot as plt
-import numpy as np
 from math import *
-import sys #sys.argv pour permettre de pouvoir entrer les données sur powershell ou bien le terminal de windows
+import sys 
+#sys.argv pour permettre de pouvoir entrer les données sur powershell ou bien le terminal de windows
 
 
-
-KM = pd.read_csv ('EIVP_KMbis.csv' ,sep = ';') #il faut remplacer EIVP_projet_1\EIVP_KM.csv par ce qu'on a comme dossier
+KM = pd.read_csv ('EIVP_KMbis.csv' ,sep = ';') 
 #print(KMb.tail(60)['sent_at'])  #pour s'assurer que le fichier est bien reconnu par le système
 KMb = KM.sort_values (by = 'id')
 
 
 
 #Compter les limites en terme de valeurs de chaque capteurs pour pour le passage entre les capteurs pour toutes les fonctions
-def count_time (KMb, id, time) :
-    
+def count_time (KMb, id, time) : #exemple : count_time (KMb, 'id', 'sent_at')
     count = 0
     count_time1 = [0] #définition du 1er élément qui est forcément 0 (on pose cette liste en tant que liste des éléments inférieurs)
     count_time2 = [] #définition du 1er élément qui est forcément vide (on pose cette liste en tant que liste des éléments supérieurs)
@@ -32,8 +30,7 @@ def count_time (KMb, id, time) :
 
 
 # pouvoir créer des listes de temps ou chaque temps est représenté en points
-def Temps (KMb, id, time, start_at, end_at, f1) :
-    
+def Temps (KMb, id, time, start_at, end_at, f1) : #exemple : Temps (KMb, 'id', 'sent_at', '2019-08-11', '2019-08-25', count_time (KMb, 'id', 'sent_at'))
     Temp = []
     j = 0
     
@@ -50,38 +47,37 @@ def Temps (KMb, id, time, start_at, end_at, f1) :
                 l += 1
             j += 1
             
-    return Temp
+    return (Temp)
 
 
-
-def point1 ( KMb, colonne, id,time, start_at, end_at, f1, f2 ): #fonction très courte permettant de mettre les éléments du dataframe KMb au sein d'une concaténation de listes
-    
+#fonction très courte permettant de mettre les éléments du dataframe KMb au sein d'une concaténation de listes
+def point1 (KMb, colonne, id, time, start_at, end_at, f1, f2): #Exemple : point1 (KMb, 'lum', 'id', 'sent_at', '2019-08-11', '2019-08-25', count_time (KMb, 'id', 'sent_at'), Temps (KMb, 'id', 'sent_at', '2019-08-11', '2019-08-25', count_time (KMb, 'id', 'sent_at')))
     y = [] 
     j=0
     
-    for i in range(len(f1)):
-        y.append([])
-        for j in f1[i]:
-            y[i].append(KMb[colonne][f2[0][i]+j])
-        
-    return y
+    for i in range (len (f1)) :
+        y.append ([])
+        for j in f1[i] :
+            y[i].append (KMb[colonne][f2[0][i]+ j])
+    return (y)
 
 
     
 def courbe_1 (f2, f3, colonne) :
-    cmap = plt.get_cmap('jet_r')
+    cmap = plt.get_cmap ('jet_r')
+    
     for i in range (len (f2)) :
         color1 = cmap (float(i) / len(f2))
         plt.plot (f2[i], f3[i], "-+", c = color1 , label = 'courbe du capteur ' + str (i + 1))
         plt.title ('Courbe de ' + colonne)
-        plt.legend (loc='best')
+        plt.legend (loc = 'best')
     plt.show ()
 
 
 
 
 
-def point2 (KMb, id, time, colonne, f1) : #les données du bruit sont fournies en dBA
+def point2 (KMb, id, time, colonne, f1) : 
     
     #calcul du minimum
     min_ = []
@@ -108,7 +104,7 @@ def point2 (KMb, id, time, colonne, f1) : #les données du bruit sont fournies e
     
     for j in range (len (f1[0])) :
         a = 0
-        for k in range (f1[0][j],f1[1][j]) :
+        for k in range (f1[0][j], f1[1][j]) :
             a += KMb[colonne][k]
         a = a / (f1[1][j] - f1[0][j]) #on obtient la moyenne arithmétique
         moy.append (a)
@@ -119,7 +115,7 @@ def point2 (KMb, id, time, colonne, f1) : #les données du bruit sont fournies e
         b = 0
         for k in range (f1[0][j], f1[1][j]) : 
             b += (abs (KMb[colonne][k] - moy[j])) ** 2
-        ect.append( (b / (f1[1][j] - f1[0][j])) ** (1/2))
+        ect.append ((b / (f1[1][j] - f1[0][j])) ** (1/2))
         l += 1
     
     #calcul de la variance
@@ -151,6 +147,7 @@ def point2 (KMb, id, time, colonne, f1) : #les données du bruit sont fournies e
             med.append (L[j][len (L[j]) // 2 + 1])
         
 #on différencie maintenant suivant chaque colonne
+#les données du bruit sont fournies en dBA
     if colonne == 'noise' :
         #on va maintenant faire la moyenne logarithmique
         d = 0
@@ -167,8 +164,7 @@ def point2 (KMb, id, time, colonne, f1) : #les données du bruit sont fournies e
         #print ('La moyenne des valeurs est pour chacun des 6 capteurs:', moy, 'dBA')
         #print ("L'ecart-type des données récoltées est pour chacun des 6 capteurs:", ect, 'dBA.')
         #print ("La variance est pour chacun des 6 capteurs:", V, 'dBA.')
-        #print ('Le bruit médian capté est pour chacun des 6 capteurs:', moylog, 'dBA.')
-        
+        #print ('Le bruit médian capté est pour chacun des 6 capteurs:', moylog, 'dBA.')        
         return min_, max_, moylog, ect, V, med, ['min_', 'max_', 'moyenne logarithmique', 'ect', 'V', 'médiane']
         
         
@@ -188,8 +184,7 @@ def point2 (KMb, id, time, colonne, f1) : #les données du bruit sont fournies e
         #print ('La valeur moyenne est pour chacun des 6 capteurs:', moy)
         #print ("L'ecart-type des données récoltées est pour chacun des 6 capteurs:", ect)
         #print ("La variance est de pour chacun des 6 capteurs:", V)
-        #print ('La valeur médiane captée est de pour chacun des 6 capteurs:', moyari)
-        
+        #print ('La valeur médiane captée est de pour chacun des 6 capteurs:', moyari)  
         return min_, max_, moyari , ect, V, med, ['min_', 'max_', 'moy', 'ect', 'V', 'médiane'] 
         
     if colonne == 'humidity' :
@@ -209,13 +204,11 @@ def point2 (KMb, id, time, colonne, f1) : #les données du bruit sont fournies e
         #print ("L'ecart-type des données récoltées est", ect)
         #print ("La variance est de", V)
         #print ('La valeur médiane captée est de pour chacun des 6 capteurs:', moygeo)
-        
         return min_, max_, moygeo, ect, V, med, ['min_', 'max_', 'moygeo', 'ect', 'V', 'médiane'] 
 
 
 
 def courbe_2 (f2, f3, point2, colonne) : #A la différence de la courbe_1, ici on fait en sorte d'afficher la 1ere courbe et également les autres courbes sous la forme de 
-
     #f1 correspond à la liste de temps sous forme de 
     #f2 correspond à la limite sur le tableau KMb des divers capteurs
     cmap = plt.get_cmap('jet_r')
@@ -258,7 +251,6 @@ def courbe_2 (f2, f3, point2, colonne) : #A la différence de la courbe_1, ici o
 
 
 def point3 (KMb, id, time, f1) :
-
     THx = pd.read_csv ('Humidex.csv', sep=';')
     Hr1 = KMb['humidity']
     T1 = KMb['temp']
@@ -294,7 +286,6 @@ def point3 (KMb, id, time, f1) :
     
     
 def point4 (KMb, colonne1, colonne2, id, time, f1) :
-    
     moy1 = point2 (KMb, 'id', time, colonne1, f1)[2]
     moy2 = point2 (KMb, 'id', time, colonne2, f1)[2]
     #on calcule d'abord la covariance
